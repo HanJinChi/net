@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1121</width>
-    <height>777</height>
+    <width>923</width>
+    <height>754</height>
    </rect>
   </property>
   <property name="cursor">
@@ -19,7 +19,7 @@
   <widget class="QTableWidget" name="display">
    <property name="geometry">
     <rect>
-     <x>-10</x>
+     <x>0</x>
      <y>150</y>
      <width>901</width>
      <height>281</height>
@@ -120,7 +120,7 @@
     <rect>
      <x>0</x>
      <y>430</y>
-     <width>891</width>
+     <width>901</width>
      <height>131</height>
     </rect>
    </property>
@@ -130,7 +130,7 @@
     <rect>
      <x>0</x>
      <y>560</y>
-     <width>891</width>
+     <width>901</width>
      <height>151</height>
     </rect>
    </property>

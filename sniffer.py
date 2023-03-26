@@ -30,16 +30,9 @@ class Sniff:
         self.ui.stop.clicked.connect(self.Stop)
         self.ui.clear.clicked.connect(self.Clear)
         self.ui.display.clicked.connect(self.Print)
-        self.Message = []
-        self.ui.display.setColumnWidth(0,40)
-        self.ui.display.setColumnWidth(1,200)
-        self.ui.display.setColumnWidth(2,120)
-        self.ui.display.setColumnWidth(3,120)
-        self.ui.display.setColumnWidth(4,80)
-        self.ui.display.setColumnWidth(5,60)
-        self.ui.display.setColumnWidth(6,400)
-        
+        self.Message = []        
         signal.textPrint.connect(self.Update)
+        self.stop_thread = False
         
         
         
@@ -63,12 +56,15 @@ class Sniff:
         
     def Begin(self):
         network_card = self.ui.choice.currentText()
-        thread = Thread(target= self.SniffThread, args=(network_card,),daemon=True)
+        self.thread = Thread(target= self.SniffThread, args=(network_card,),daemon=True)
         print(f"NetWork Card is {network_card}")
-        thread.start()
+        self.stop_thread = False
+        self.thread.start()
+        
         return     
     
     def Stop(self):
+        self.stop_thread = True
         return
     
     def Clear(self):
@@ -86,10 +82,13 @@ class Sniff:
         self.ui.display.setItem(count,4,QTableWidgetItem(message[3]))
         self.ui.display.setItem(count,5,QTableWidgetItem(message[4]))
         self.ui.display.scrollToBottom()
+        self.Message.append(message)
         
     def Print(self):
         count = self.ui.display.selectedItems()[0]
-        self.ui.data.setText(Message[count.row()].)
+        self.ui.rowdata.setText(str(self.Message[count.row()][5]))
+        self.ui.data.setText(self.Message[count.row()][6])
+        
         
     def SniffThread(self,choice):
         sniffer = pcap.pcap(name = choice, promisc = True, immediate = True,timeout_ms = 50)
@@ -104,10 +103,9 @@ class Sniff:
                     src_socket = ''
                     dst_socket = ''
                     net_type = ""
-                    data_time = datetime.datetime.fromtimestamp(ts)
+                    data_time = str(datetime.datetime.fromtimestamp(ts))
                     row_data = ip.pack()
                     hex_data = ' '.join(hex(byte)[2:].zfill(2) for byte in row_data)
-                    print(hex_data)
                     if isinstance(ip.data, dpkt.icmp.ICMP):
                         src_socket = f"{socket.inet_ntoa(ip.src)}"
                         dst_socket = f"{socket.inet_ntoa(ip.dst)}"
@@ -133,6 +131,8 @@ class Sniff:
                     if self.CheckNetOpen(net_type):
                         message = [data_time, src_socket, dst_socket, net_type, length, row_data, hex_data]  
                         signal.textPrint.emit(message)
+                    if self.stop_thread == True:
+                        break
             except Exception as e:
                 print('Error:', e)
 
